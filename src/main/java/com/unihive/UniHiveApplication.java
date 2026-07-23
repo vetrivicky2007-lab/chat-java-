@@ -63,28 +63,32 @@ public class UniHiveApplication {
      *
      * @return the running {@link ChatServer} instance
      */
+    
     @Bean
     public ChatServer chatServer() {
-        InetSocketAddress address = new InetSocketAddress(wsHost, wsPort);
+        log.info("Host: {}", wsHost);
+        log.info("Port: {}", wsPort);
+
+        InetSocketAddress address;
+
+        if ("0.0.0.0".equals(wsHost)) {
+            address = new InetSocketAddress(wsPort);
+        } else {
+            address = new InetSocketAddress(wsHost, wsPort);
+        }
+
         ChatServer server = new ChatServer(address);
 
         Thread serverThread = new Thread(() -> {
             try {
                 server.run();
             } catch (Exception e) {
-                log.error("ChatServer encountered a fatal error: {}", e.getMessage(), e);
+                log.error("ChatServer encountered a fatal error", e);
             }
         }, "unihive-ws-server");
+
         serverThread.setDaemon(true);
         serverThread.start();
-
-        // Give the server a moment to bind and reach onStart()
-        try {
-            Thread.sleep(500);
-            log.info("ChatServer is running on ws://{}:{}", wsHost, wsPort);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
 
         return server;
     }
