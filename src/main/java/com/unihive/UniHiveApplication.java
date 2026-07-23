@@ -66,16 +66,10 @@ public class UniHiveApplication {
     
     @Bean
     public ChatServer chatServer() {
-        log.info("Host: {}", wsHost);
+
         log.info("Port: {}", wsPort);
 
-        InetSocketAddress address;
-
-        if ("0.0.0.0".equals(wsHost)) {
-            address = new InetSocketAddress(wsPort);
-        } else {
-            address = new InetSocketAddress(wsHost, wsPort);
-        }
+        InetSocketAddress address = new InetSocketAddress(wsPort);
 
         ChatServer server = new ChatServer(address);
 
