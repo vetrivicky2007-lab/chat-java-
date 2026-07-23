@@ -1,6 +1,4 @@
 package com.unihive;
-
-import com.unihive.util.ConsoleColors;
 import com.unihive.websocket.ChatServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
