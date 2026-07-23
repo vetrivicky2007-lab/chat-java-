@@ -6,6 +6,7 @@ import com.unihive.model.User;
 import com.unihive.service.AuthService;
 import com.unihive.service.AuthService.AuthResult;
 import com.unihive.util.ConsoleColors;
+import com.unihive.util.InputValidator;
 import com.unihive.websocket.ChatClient;
 import com.unihive.websocket.ChatServer;
 import lombok.RequiredArgsConstructor;
@@ -99,8 +100,28 @@ public class ConsoleController implements ApplicationRunner {
     private void handleRegistration(Scanner scanner) {
         printSectionHeader("Create Account");
 
-        String username    = prompt(scanner, "Username");
-        String email       = prompt(scanner, "Email");
+        String username = prompt(scanner, "Username");
+
+        String email;
+        while (true) {
+            email = prompt(scanner, "Email");
+            if (!InputValidator.isValidEmail(email)) {
+                print(ConsoleColors.ERROR, "Invalid email format. Please enter a valid email address.");
+                continue;
+            }
+            try {
+                if (authService.emailExists(email)) {
+                    print(ConsoleColors.ERROR, "This email is already registered.");
+                    continue;
+                }
+            } catch (Exception e) {
+                log.error("Error checking email existence: {}", e.getMessage());
+                print(ConsoleColors.ERROR, "Error checking email availability. Please try again.");
+                continue;
+            }
+            break;
+        }
+
         String password    = promptPassword(scanner, "Password");
         String confirmPass = promptPassword(scanner, "Confirm Password");
 
@@ -212,12 +233,13 @@ public class ConsoleController implements ApplicationRunner {
     //  UI Helpers
     // ─────────────────────────────────────────────────────────────
 
-    private void printBanner() {
+    private void printBanner() 
+    {
         System.out.println();
         System.out.println(ConsoleColors.HEADER + "╔══════════════════════════════════════╗" + ConsoleColors.RESET);
         System.out.println(ConsoleColors.HEADER + "║                                      ║" + ConsoleColors.RESET);
-        System.out.println(ConsoleColors.HEADER + "║   🐝  Welcome to UniHive  🐝          ║" + ConsoleColors.RESET);
-        System.out.println(ConsoleColors.HEADER + "║   Real-Time Console Chat  v1.0       ║" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.HEADER + "║          Welcome to UniHive          ║"+ ConsoleColors.RESET);
+        System.out.println(ConsoleColors.HEADER + "║     Real-Time Console Chat  v1.0     ║" + ConsoleColors.RESET);
         System.out.println(ConsoleColors.HEADER + "║                                      ║" + ConsoleColors.RESET);
         System.out.println(ConsoleColors.HEADER + "╚══════════════════════════════════════╝" + ConsoleColors.RESET);
         System.out.println();

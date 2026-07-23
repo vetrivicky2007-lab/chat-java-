@@ -135,6 +135,19 @@ public class AuthService {
         }
     }
 
+    /**
+     * Checks whether an email address is already registered in MongoDB Atlas.
+     *
+     * @param email the email to check
+     * @return {@code true} if an account with this email exists; {@code false} otherwise
+     */
+    public boolean emailExists(String email) {
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+        return userRepository.existsByEmail(email.trim().toLowerCase());
+    }
+
     // ─────────────────────────────────────────────────────────────
     //  Login
     // ─────────────────────────────────────────────────────────────

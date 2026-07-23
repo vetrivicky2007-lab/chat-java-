@@ -1,5 +1,6 @@
 package com.unihive.util;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -32,9 +33,9 @@ public final class InputValidator {
     private static final Pattern USERNAME_PATTERN =
             Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9_\\-]{" + (USERNAME_MIN_LEN - 1) + "," + (USERNAME_MAX_LEN - 1) + "}$");
 
-    /** RFC-5322-inspired email validation pattern (practical subset). */
+    /** Email validation pattern requiring valid local part, @ symbol, valid domain label, and top-level domain. */
     private static final Pattern EMAIL_PATTERN =
-            Pattern.compile("^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$");
+            Pattern.compile("^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+)*\\.[a-zA-Z]{2,}$");
 
     // ─────────────────────────────────────────────────────────────
     //  Constructor — prevent instantiation
@@ -67,17 +68,28 @@ public final class InputValidator {
     }
 
     /**
+     * Checks whether an email address format is valid using {@link Pattern} and {@link Matcher}.
+     *
+     * @param email the email to validate
+     * @return {@code true} if format is valid; {@code false} otherwise
+     */
+    public static boolean isValidEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+        Matcher matcher = EMAIL_PATTERN.matcher(email.trim());
+        return matcher.matches();
+    }
+
+    /**
      * Validates an email address format.
      *
      * @param email the email to validate
      * @return {@code null} if valid; a human-readable error message otherwise
      */
     public static String validateEmail(String email) {
-        if (email == null || email.isBlank()) {
-            return "Email cannot be empty.";
-        }
-        if (!EMAIL_PATTERN.matcher(email.trim()).matches()) {
-            return "Please enter a valid email address (e.g. user@example.com).";
+        if (!isValidEmail(email)) {
+            return "Invalid email format. Please enter a valid email address.";
         }
         return null; // valid
     }
